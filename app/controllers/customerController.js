@@ -142,16 +142,7 @@ const updateCustomer = (req, res) => {
             message: "fullName is required!"
         })
     }
-    if (body.phone !== undefined && body.phone == "") {
-        return res.status(400).json({
-            message: "phone is required!"
-        })
-    }
-    if (body.password !== undefined && body.password == "") {
-        return res.status(400).json({
-            message: "password is required!"
-        })
-    }
+    
 
     if (!validateEmail(body.email)) {
         return res.status(400).json({
@@ -183,7 +174,7 @@ const updateCustomer = (req, res) => {
 
         return res.status(200).json({
             message: "Update Customer successfully",
-            updatedCustomer: data
+            Customer: data
         })
     })
 }
@@ -191,27 +182,15 @@ const updateCustomer = (req, res) => {
 // Delete CustomerType
 const deleteCustomer = async (req, res) => {
     // B1: Thu thập dữ liệu từ req
-    let customerId = req.params.customerId;
 
-    // B2: Validate dữ liệu
-    if (!mongoose.Types.ObjectId.isValid(customerId)) {
-        return res.status(400).json({
-            message: "CustomerID is invalid!"
-        })
+    try {
+        await orderModel.updateMany({ buyer: req.params.customerId }, { buyer: null })
+        await customerModel.findByIdAndDelete(req.params.customerId)
+        res.status(200).json('delete successfully')
+    } catch (error) {
+        res.status(200).json(error)
     }
-    await orderModel.updateMany({ buyer: customerId }, { buyer: null })
-    // B3: Gọi model thực hiện các thao tác nghiệp vụ
-    await customerModel.findByIdAndDelete(customerId, (error, data) => {
-        if (error) {
-            return res.status(500).json({
-                message: error.message
-            })
-        }
 
-        return res.status(204).json({
-            message: "Delete Customer successfully"
-        })
-    })
 }
 
 // Export Drink controller thành 1 module

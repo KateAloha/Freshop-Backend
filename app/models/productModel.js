@@ -32,12 +32,6 @@ const product = new Schema({
         type: Number,
         default: 0
     },
-    categories: [
-        {
-            type: String,
-            require: true
-        }
-    ],
     imageChild: [ {
         type: String,
         default: ""

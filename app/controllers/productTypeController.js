@@ -102,23 +102,13 @@ const updateProductTypeById = (req, res) => {
 
 //delete by productType Id
 const deleteByProductTypeId = async (req,res) => {
-    let productTypeId = req.params.productTypeId;
-    if (!mongoose.Types.ObjectId.isValid(productTypeId)) {
-        return res.status(400).json({
-            message: `productTypeId is invalid`
-        })
+    try {
+        await productModel.updateMany({type: req.params.productTypeId}, {type: null})
+        await productTypeModel.findByIdAndDelete(req.params.productTypeId)
+        res.status(200).json('delete successfully')
+    } catch (error) {
+        res.status(200).json(error)
     }
-    await productModel.updateMany({type: productTypeId}, {type: null})
-    await productTypeModel.findByIdAndDelete(productTypeId, (error,data)=> {
-        if(error) {
-            return res.status(500).json({
-                message: error.message
-            })
-        }
-        return res.status(204).json({
-            message: `delete success`
-        })
-    })
 }
 
 

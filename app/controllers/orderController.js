@@ -181,7 +181,7 @@ const updateOrderById = (req, res) => {
         } else {
             return res.status(200).json({
                 status: "Success: Update order success",
-                data: data
+                order: data
             })
         }
     })
@@ -189,30 +189,13 @@ const updateOrderById = (req, res) => {
 
 const deleteOrderById = async (req, res) => {
     //B1: Chuẩn bị dữ liệu
-    
-    let orderId = req.params.orderId;
-    //B2: Validate dữ liệu
-
-    if(!mongoose.Types.ObjectId.isValid(orderId)) {
-        return res.status(400).json({
-            status: "Error 400: Bad req",
-            message: "Order ID is not valid"
-        })
+    try {
+        await customerModel.updateMany({orders: req.params.orderId}, {$pull: {order: req.params.orderId}})
+        await orderModel.findByIdAndDelete(req.params.orderId)
+        res.status(200).json('delete successfully')
+    } catch (error) {
+        res.status(200).json(error)
     }
-    //B3: Thao tác với cơ sở dữ liệu
-    await customerModel.updateMany({orders: orderId}, {$pull: {order: orderId}})
-    
-    await orderModel.findByIdAndDelete(orderId, (error) => {
-        if(error) {
-            return res.status(500).json({
-                status: "Error 500: Internal server error",
-                message: error.message
-            })
-        }
-        return res.status(204).json({
-            message: 'delete successfully'
-        })
-    })
 }
   // Export customer controller thành 1 module
 module.exports = {
